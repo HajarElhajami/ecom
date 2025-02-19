@@ -108,6 +108,7 @@
 
 
 
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -117,7 +118,7 @@ require("dotenv").config();
 
 const productRoutes = require("./backend/routes/productRoutes");
 const userRoutes = require("./backend/routes/userRoutes");
-// const requestsRoutes = require("./backend/routes/requestsRoutes");
+const requestsRoutes = require("./backend/routes/requestsRoutes");
 
 const app = express();
 app.use(express.json());
@@ -132,9 +133,24 @@ mongoose
 
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
-// app.use("/api/requests", requestsRoutes); // مسار الطلبات
+app.use("/api/requests", requestsRoutes); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

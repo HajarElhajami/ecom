@@ -1,39 +1,52 @@
-const Order = require("../models/Order");
+const Order = require("../models/Requests"); // تأكد أن الاسم متطابق
 
 const createOrder = async (req, res) => {
+  console.log("✅ بدء إنشاء الطلب...");
+  
   try {
-    const { user, products, totalAmount } = req.body;
-    if (!user || !products || !totalAmount) {
+    const { customerName, customerPhone, customerCity, productId } = req.body;
+
+    if (!customerName || !customerPhone || !customerCity || !productId) {
       return res.status(400).json({ message: "❌ جميع الحقول مطلوبة" });
     }
 
-    const newOrder = new Order({ user, products, totalAmount });
+    const newOrder = new Order({
+      customerName,
+      customerPhone,
+      customerCity,
+      product: productId, 
+    });
+
     await newOrder.save();
-    res.status(201).json(newOrder);
+    res.status(201).json({ message: "✅ تم إنشاء الطلب بنجاح!", order: newOrder });
+
   } catch (error) {
+    console.error("❌ خطأ أثناء إنشاء الطلب:", error);
     res.status(500).json({ message: "❌ فشل في إنشاء الطلب", error });
   }
 };
 
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("user products.product");
+    const orders = await Order.find().populate("product");
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: "❌ فشل في جلب الطلبات" });
+    res.status(500).json({ message: "❌ خطأ في جلب الطلبات", error });
   }
 };
 
 const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate("user products.product");
+    const order = await Order.findById(req.params.id).populate("product");
     if (!order) {
       return res.status(404).json({ message: "❌ الطلب غير موجود" });
     }
     res.json(order);
   } catch (error) {
-    res.status(500).json({ message: "❌ فشل في جلب الطلب" });
+    res.status(500).json({ message: "❌ خطأ في جلب الطلب", error });
   }
 };
+
+
 
 module.exports = { createOrder, getOrders, getOrderById };

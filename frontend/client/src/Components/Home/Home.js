@@ -5,9 +5,8 @@ import Section from './Section';
 
 function Home() {
     return (
-    <div className="">
+    <div>
       <Section />
-
     </div> 
   );
 };

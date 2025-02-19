@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,7 @@ function Products() {
       const response = await fetch("http://localhost:5000/api/products");
       if (!response.ok) throw new Error("❌ خطأ في جلب المنتجات");
       const data = await response.json();
-      console.log(data); 
+      console.log(data);
       setProducts(data);
     } catch (error) {
       setError(error.message);
@@ -78,7 +78,7 @@ function Products() {
       });
 
       if (!response.ok) throw new Error("❌ فشل في حذف المنتج");
-      
+
       setProducts(products.filter((product) => product._id !== id));
     } catch (error) {
       alert(error.message);
@@ -87,72 +87,153 @@ function Products() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-semibold">📦 المنتجات</h1>
+      <h1 className="text-3xl font-semibold mb-4">📦 المنتجات</h1>
 
-      <button onClick={() => setShowForm(true)} className="bg-green-500 text-white px-7 py-2 text-[18px] rounded my-4">
+      {/* زر إضافة منتج جديد */}
+      <button
+        onClick={() => setShowForm(true)}
+        className="bg-green-500 text-white px-7 py-2 text-[18px] rounded mb-4"
+      >
         + إضافة منتج
       </button>
 
+      {/* فورم إضافة منتج */}
       {showForm && (
-        <div className="bg-white p-4 rounded shadow-lg">
+        <div className="bg-white p-4 rounded shadow-lg mb-4">
           <h2 className="text-xl font-semibold mb-5">🆕 إضافة منتج جديد</h2>
-          <input className="border p-2 w-full mb-3" placeholder="اسم المنتج" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
-          <input className="border p-2 w-full mb-3" type="number" placeholder="السعر" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
-          <input className="border p-2 w-full mb-3" placeholder="الوصف" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} />
+          <input
+            className="border p-2 w-full mb-3"
+            placeholder="اسم المنتج"
+            value={newProduct.name}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, name: e.target.value })
+            }
+          />
+          <input
+            className="border p-2 w-full mb-3"
+            type="number"
+            placeholder="السعر"
+            value={newProduct.price}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, price: e.target.value })
+            }
+          />
+          <input
+            className="border p-2 w-full mb-3"
+            placeholder="الوصف"
+            value={newProduct.description}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, description: e.target.value })
+            }
+          />
 
           <label className="border border-dashed border-gray-400 w-full h-32 flex flex-col items-center justify-center cursor-pointer bg-gray-100 rounded-lg">
             {preview ? (
-              <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+              <img
+                src={preview}
+                alt="Preview"
+                className="w-full h-full object-cover rounded-lg"
+              />
             ) : (
               <span className="text-gray-500">🖼️ إضافة صور</span>
             )}
             <input type="file" className="hidden" onChange={handleFileChange} />
           </label>
           <br />
-          <button onClick={addProduct} className="bg-blue-600 text-white px-4 py-2 rounded">إضافة</button>
-          <button onClick={() => setShowForm(false)} className="ml-2 bg-gray-400 text-white px-4 py-2 rounded">إلغاء</button>
+          <button
+            onClick={addProduct}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            إضافة
+          </button>
+          <button
+            onClick={() => setShowForm(false)}
+            className="ml-2 bg-gray-400 text-white px-4 py-2 rounded"
+          >
+            إلغاء
+          </button>
         </div>
       )}
 
       {loading && <p>⏳ جاري تحميل المنتجات...</p>}
       {error && <p className="text-red-500">❌ حدث خطأ: {error}</p>}
 
-      <div className="grid grid-cols-4 gap-6 mt-6">
-        {products.map((product) => (
-          <div key={product._id} className="bg-gray-100 p-5 rounded-lg shadow-md relative">
-            <img
-              src={`http://localhost:5000${product.image}`}
-              alt={product.name}
-              className="w-full h-48 object-cover rounded-t-lg cursor-pointer"
-              onClick={() => setSelectedProduct(product)}
-            />
-            <h2 className="text-xl text-center font-semibold mt-4">{product.name}</h2>
-            <p className="text-gray-600 text-center mt-2">{product.description}</p>
-            <p className="text-green-500 text-center font-semibold mt-2">{product.price} د.م</p>
-
-            <button
-              onClick={() => deleteProduct(product._id)}
-              className="absolute top-2 right-1 rounded-full">
-                ❌
-            </button>
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <table className="w-full bg-white border border-gray-200 rounded shadow-sm">
+          <thead className="bg-gray-100 border-b">
+            <tr>
+              <th className="py-2 px-4 text-left">صورة</th>
+              <th className="py-2 px-4 text-left">الاسم</th>
+              <th className="py-2 px-4 text-left">السعر</th>
+              <th className="py-2 px-4 text-left">الطلبات</th>
+              <th className="py-2 px-4 text-left">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr
+                key={product._id}
+                className="border-b hover:bg-gray-50 transition"
+              >
+                <td className="py-2 px-4">
+                  <img
+                    src={`http://localhost:5000${product.image}`}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                </td>
+                <td className="py-2 px-4 font-medium">{product.name}</td>
+                <td className="py-2 px-4 text-green-600 font-bold">
+                  {product.price} د.م
+                </td>
+                <td className="py-2 px-4">{product.orders || 0}</td>
+                <td className="py-2 px-4">
+                  <button
+                    className="mr-2 text-blue-500 hover:text-blue-700"
+                    onClick={() => {
+                      setSelectedProduct(product);
+                    }}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => deleteProduct(product._id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[500px] h-[500px]">
-            <h2 className="text-3xl text-center font-semibold">{selectedProduct.name}</h2>
-            {selectedProduct.image ? (
-              <img src={`http://localhost:5000${selectedProduct.image}`} alt={selectedProduct.name} className="w-full h-64 object-cover rounded-lg mt-4" />
-            ) : (
-              <div className="w-full h-64 bg-gray-300 flex items-center justify-center rounded-lg mt-4">📷 لا توجد صورة</div>
-            )}
-            <p className="text-gray-600 text-center mt-2">{selectedProduct.description}</p>
-            <p className="text-green-600 text-xl font-bold text-center mt-2">{selectedProduct.price} د.م</p>
-            <button onClick={() => setSelectedProduct(null)} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
-              إغلاق
-            </button>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[500px] h-auto">
+            <h2 className="text-2xl text-center font-semibold mb-4">
+              تعديل المنتج
+            </h2>
+            <img
+              src={`http://localhost:5000${selectedProduct.image}`}
+              alt={selectedProduct.name}
+              className="w-full h-64 object-cover rounded-lg"
+            />
+            <p className="text-gray-600 text-center mt-2">
+              {selectedProduct.description}
+            </p>
+            <p className="text-green-600 text-xl font-bold text-center mt-2">
+              {selectedProduct.price} د.م
+            </p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                إغلاق
+              </button>
+            </div>
           </div>
         </div>
       )}

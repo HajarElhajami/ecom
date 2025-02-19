@@ -10,13 +10,16 @@ function Dashboard() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/products'); 
-        if (!response.ok) {
-          throw new Error('حدث خطأ في الاتصال بالـ API');
-        }
-        const data = await response.json();
-        setProductCount(data.length);  
-        setOrderCount(0);      
+        const productRes = await fetch('http://localhost:5000/api/products');
+        if (!productRes.ok) throw new Error('❌ خطأ أثناء جلب المنتجات');
+        const products = await productRes.json();
+        setProductCount(products.length);
+
+        const orderRes = await fetch('http://localhost:5000/api/requests');
+        if (!orderRes.ok) throw new Error('❌ خطأ أثناء جلب الطلبات');
+        const orders = await orderRes.json();
+        setOrderCount(orders.length);
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -29,18 +32,19 @@ function Dashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-4xl text-center pt-[5%] font-semibold mb-4">الصفحة الرئيسية</h1>
-      {loading && <p>جاري تحميل البيانات...</p>}
-      {error && <p className="text-red-500">حدث خطأ: {error}</p>}
+      <h1 className="text-4xl text-center pt-[5%] font-semibold mb-4">📊 الصفحة الرئيسية</h1>
 
-      <div className="grid grid-cols-2 pt-[10%] gap-6">
-        <div className="bg-gray-100 p-6 rounded-lg">
-          <p className='text-center text-xl'>عدد المنتجات</p>
-          <h3 className="text-2xl text-center pt-3">{productCount}</h3>
+      {loading && <p className="text-center text-blue-500">⏳ جاري تحميل البيانات...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
+
+      <div className="grid grid-cols-2 pt-10 gap-6">
+       <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <p className="text-center text-xl font-semibold">📦 عدد المنتجات</p>
+          <h3 className="text-3xl text-center pt-3 font-bold">{productCount}</h3>
         </div>
-        <div className="bg-gray-100 p-6 rounded-lg">
-          <p className='text-center text-xl'>الطلبات الجديدة</p>
-          <h3 className="text-2xl text-center pt-3">{orderCount}</h3>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <p className="text-center text-xl font-semibold">🛒 الطلبات الجديدة</p>
+          <h3 className="text-3xl text-center pt-3 font-bold">{orderCount}</h3>
         </div>
       </div>
     </div>

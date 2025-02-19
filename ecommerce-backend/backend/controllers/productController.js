@@ -39,4 +39,17 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, addProduct, deleteProduct };
+const getProduct = async (req, res) => {
+  
+    const productId = req.params.id;
+    
+
+    try {
+      const product = await Product.findById(productId);
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ message: "❌ خطأ في جلب المنتجات", error });
+    }
+};
+
+module.exports = { getProducts, addProduct, deleteProduct , getProduct };
